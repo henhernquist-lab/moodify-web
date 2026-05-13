@@ -1,6 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
+import { AppShell } from '@/components/app-shell'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -11,19 +12,26 @@ const inter = Inter({
 const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-playfair',
+  style: ['normal', 'italic'],
   display: 'swap',
 })
 
 export const metadata: Metadata = {
   title: 'Moodify — Find Your Next Favorite Song',
   description:
-    'Discover music based on what you love. Enter a track or describe your mood and Moodify surfaces songs that match your vibe.',
+    'Discover music based on how you feel. Enter a track you love or describe your mood and Moodify surfaces songs that match your vibe.',
+}
+
+export const viewport: Viewport = {
+  themeColor: '#0B0B0F',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} bg-background`}>
-      <body className="font-sans antialiased">{children}</body>
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   )
 }

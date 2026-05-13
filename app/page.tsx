@@ -1,103 +1,109 @@
-'use client'
+import { MusicCard } from '@/components/music-card'
+import { ScrollRow } from '@/components/scroll-row'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Search } from 'lucide-react'
-import { Navbar } from '@/components/navbar'
-import { MoodSelector } from '@/components/mood-selector'
-import { SmallSongCard } from '@/components/small-song-card'
-import { ThemeProvider } from '@/components/theme-provider'
+const RECENTLY_PLAYED = [
+  { title: 'Redbone',          artist: 'Childish Gambino', albumColor: '#4a1c2e' },
+  { title: 'Nights',           artist: 'Frank Ocean',      albumColor: '#1b2a4a' },
+  { title: 'Midnight Rain',    artist: 'Taylor Swift',     albumColor: '#2a1a4e' },
+  { title: 'Motion Sickness',  artist: 'Phoebe Bridgers',  albumColor: '#1e3a2a' },
+  { title: 'Supercut',         artist: 'Lorde',            albumColor: '#3a1a1a' },
+  { title: 'Pink + White',     artist: 'Frank Ocean',      albumColor: '#2e2040' },
+]
 
-const RECENT_SEARCHES = [
-  { title: 'Redbone', artist: 'Childish Gambino' },
-  { title: 'Midnight Rain', artist: 'Taylor Swift' },
-  { title: 'Nights', artist: 'Frank Ocean' },
-  { title: 'Motion Sickness', artist: 'Phoebe Bridgers' },
+const MOOD_RECS = [
+  { title: 'Slow Burn',        artist: 'Kacey Musgraves',  albumColor: '#2a3a1e' },
+  { title: 'Liability',        artist: 'Lorde',            albumColor: '#1a1a3a' },
+  { title: 'Lost in the Light',artist: 'Bahamas',          albumColor: '#2a1e1e' },
+  { title: 'Saturn',           artist: 'Stevie Wonder',    albumColor: '#1e2a3a' },
+  { title: 'Golden Hour',      artist: 'JVKE',             albumColor: '#3a2a1a' },
+  { title: 'Electric Feel',    artist: 'MGMT',             albumColor: '#1a3a2a' },
+]
+
+const TRENDING = [
+  { title: 'Espresso',         artist: 'Sabrina Carpenter',albumColor: '#3a1e2a' },
+  { title: 'Please Please Please', artist: 'Sabrina Carpenter', albumColor: '#2e1a3a' },
+  { title: 'Birds of a Feather', artist: 'Billie Eilish',  albumColor: '#0e1e2a' },
+  { title: 'Good Luck, Babe!', artist: 'Chappell Roan',    albumColor: '#3a1a2e' },
+  { title: 'LUNCH',            artist: 'Billie Eilish',    albumColor: '#1a2e1a' },
+  { title: 'Not Like Us',      artist: 'Kendrick Lamar',   albumColor: '#2a1a1a' },
+]
+
+const VIBE_MIXES = [
+  { title: 'Late Night Drive',     artist: 'Curated for you · 24 songs', albumColor: '#1a1a3e' },
+  { title: 'Melancholic Mondays',  artist: 'Curated for you · 18 songs', albumColor: '#2a1a2e' },
+  { title: 'Focus State',          artist: 'Curated for you · 31 songs', albumColor: '#0e2a2a' },
+  { title: 'Sunday Slow Mornings', artist: 'Curated for you · 22 songs', albumColor: '#2a2a1a' },
 ]
 
 export default function HomePage() {
-  const [query, setQuery] = useState('')
-  const [focused, setFocused] = useState(false)
-  const router = useRouter()
-
-  const handleDiscover = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!query.trim()) return
-    router.push(`/results?q=${encodeURIComponent(query.trim())}`)
-  }
-
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-background flex flex-col">
-        <Navbar />
+    <div className="px-6 py-8 lg:px-8 lg:py-10 max-w-[1200px]">
 
-        <main className="flex-1 flex flex-col items-center justify-center px-6 py-16 max-w-2xl mx-auto w-full">
-          {/* Hero */}
-          <section className="w-full text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground text-balance leading-tight mb-4">
-              Find your next<br />favorite song.
-            </h1>
-            <p className="text-base text-muted-foreground leading-relaxed text-balance">
-              Type a track you love or describe how you&apos;re feeling.
-            </p>
-          </section>
+      {/* Greeting */}
+      <header className="mb-12">
+        <h1
+          className="text-3xl lg:text-4xl font-semibold tracking-tight"
+          style={{ color: 'var(--foreground)', lineHeight: 1.2 }}
+        >
+          Good evening, Jamie.
+        </h1>
+        <p className="mt-2 text-base" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
+          {"Here's what matches your vibe tonight."}
+        </p>
+      </header>
 
-          {/* Search + discover form */}
-          <form onSubmit={handleDiscover} className="w-full flex flex-col gap-6">
-            {/* Search bar */}
-            <div className="relative">
-              <Search
-                size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-                aria-hidden="true"
-              />
-              <input
-                type="text"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                placeholder="Enter a song or artist..."
-                aria-label="Search for a song or artist"
-                className="w-full h-14 pl-12 pr-4 bg-surface border rounded-lg text-foreground placeholder:text-muted-foreground text-base outline-none transition-colors duration-150"
-                style={{
-                  borderColor: focused ? 'var(--accent)' : 'var(--border)',
-                  boxShadow: focused ? `0 0 0 1px var(--accent)` : 'none',
-                }}
-              />
-            </div>
+      {/* Recently Played */}
+      <section className="mb-12">
+        <div className="flex items-baseline justify-between mb-6">
+          <h2 className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>Recently Played</h2>
+          <a href="#" className="text-xs" style={{ color: 'var(--muted)' }}>See all</a>
+        </div>
+        <ScrollRow>
+          {RECENTLY_PLAYED.map(card => (
+            <MusicCard key={card.title} {...card} showSaveButton />
+          ))}
+        </ScrollRow>
+      </section>
 
-            {/* Mood & energy selectors */}
-            <div className="rounded-lg border border-border bg-card p-6">
-              <MoodSelector />
-            </div>
+      {/* Mood-Based Recommendations */}
+      <section className="mb-12">
+        <div className="flex items-baseline justify-between mb-6">
+          <h2 className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>Based on Your Mood</h2>
+          <a href="#" className="text-xs" style={{ color: 'var(--muted)' }}>See all</a>
+        </div>
+        <ScrollRow>
+          {MOOD_RECS.map(card => (
+            <MusicCard key={card.title} {...card} showSaveButton />
+          ))}
+        </ScrollRow>
+      </section>
 
-            {/* Discover button */}
-            <button
-              type="submit"
-              className="w-full md:w-48 md:mx-auto h-12 rounded-lg bg-accent text-accent-foreground font-semibold text-sm hover:bg-accent-hover transition-colors duration-150"
-            >
-              Discover
-            </button>
-          </form>
+      {/* Trending */}
+      <section className="mb-12">
+        <div className="flex items-baseline justify-between mb-6">
+          <h2 className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>Trending Right Now</h2>
+          <a href="#" className="text-xs" style={{ color: 'var(--muted)' }}>See all</a>
+        </div>
+        <ScrollRow>
+          {TRENDING.map(card => (
+            <MusicCard key={card.title} {...card} showSaveButton />
+          ))}
+        </ScrollRow>
+      </section>
 
-          {/* Recently searched */}
-          <section className="w-full mt-14" aria-label="Recently searched">
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-              Recently Searched
-            </h2>
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-              {RECENT_SEARCHES.map(song => (
-                <SmallSongCard
-                  key={song.title}
-                  title={song.title}
-                  artist={song.artist}
-                />
-              ))}
-            </div>
-          </section>
-        </main>
-      </div>
-    </ThemeProvider>
+      {/* AI Vibe Mixes */}
+      <section>
+        <div className="flex items-baseline justify-between mb-6">
+          <h2 className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>AI Vibe Mixes</h2>
+          <a href="#" className="text-xs" style={{ color: 'var(--muted)' }}>See all</a>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {VIBE_MIXES.map(card => (
+            <MusicCard key={card.title} {...card} variant="landscape" />
+          ))}
+        </div>
+      </section>
+
+    </div>
   )
 }
