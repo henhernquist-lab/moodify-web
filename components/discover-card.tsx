@@ -1,18 +1,29 @@
 'use client'
 
 import { useState } from 'react'
-import { Play, Heart } from 'lucide-react'
+import { Play, Heart, Loader as Loader2 } from 'lucide-react'
+import { useNowPlaying } from '@/src/lib/now-playing'
+import { PlayingIndicator } from '@/components/playing-indicator'
 
 interface DiscoverCardProps {
   title: string
   artist: string
   albumColor?: string
   genre?: string
+  image?: string
 }
 
-export function DiscoverCard({ title, artist, albumColor = '#1a1a3a', genre }: DiscoverCardProps) {
+export function DiscoverCard({ title, artist, albumColor = '#1a1a3a', genre, image }: DiscoverCardProps) {
   const [hovered, setHovered] = useState(false)
   const [liked, setLiked] = useState(false)
+  const { track, loading, play } = useNowPlaying()
+
+  const isCurrentTrack = track?.title === title && track?.artist === artist
+
+  const handlePlay = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    play(title, artist, image ?? '')
+  }
 
   return (
     <article
@@ -45,14 +56,21 @@ export function DiscoverCard({ title, artist, albumColor = '#1a1a3a', genre }: D
         {/* Play overlay */}
         <div
           className="absolute inset-0 flex items-center justify-center transition-opacity duration-150"
-          style={{ opacity: hovered ? 1 : 0 }}
+          style={{ opacity: hovered || isCurrentTrack ? 1 : 0 }}
         >
-          <div
+          <button
+            onClick={handlePlay}
             className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{ background: 'rgba(124,92,255,0.9)' }}
           >
-            <Play size={16} style={{ color: '#ffffff' }} className="ml-0.5" />
-          </div>
+            {loading && isCurrentTrack ? (
+              <Loader2 size={16} className="animate-spin" style={{ color: '#ffffff' }} />
+            ) : isCurrentTrack ? (
+              <PlayingIndicator />
+            ) : (
+              <Play size={16} style={{ color: '#ffffff' }} className="ml-0.5" />
+            )}
+          </button>
         </div>
       </div>
 

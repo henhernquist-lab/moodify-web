@@ -2,18 +2,12 @@
 
 import { useState } from 'react'
 import { Play, Pause, SkipBack, SkipForward, Heart, Volume2, ListMusic } from 'lucide-react'
-
-const NOW_PLAYING = {
-  title: 'Self Control',
-  artist: 'Frank Ocean',
-  color: '#3a2a6e',
-}
+import { useNowPlaying } from '@/src/lib/now-playing'
 
 export function MiniPlayer() {
-  const [playing, setPlaying] = useState(false)
-  const [liked,   setLiked]   = useState(false)
-  const [progress, setProgress] = useState(34)
-  const [volume,   setVolume]   = useState(70)
+  const { track, playing, progress, toggle } = useNowPlaying()
+  const [liked, setLiked] = useState(false)
+  const [volume, setVolume] = useState(70)
 
   return (
     <div
@@ -28,7 +22,7 @@ export function MiniPlayer() {
           min={0}
           max={100}
           value={progress}
-          onChange={e => setProgress(Number(e.target.value))}
+          onChange={e => {/* real audio later */}}
           aria-label="Song progress"
           style={{
             background: `linear-gradient(to right, var(--accent) ${progress}%, var(--border) ${progress}%)`,
@@ -41,19 +35,47 @@ export function MiniPlayer() {
 
         {/* Left — track info */}
         <div className="flex items-center gap-3 min-w-0 flex-1 lg:flex-none lg:w-64">
-          <div
-            className="w-10 h-10 rounded flex-shrink-0"
-            style={{ background: NOW_PLAYING.color }}
-            aria-hidden="true"
-          />
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>
-              {NOW_PLAYING.title}
-            </p>
-            <p className="text-xs truncate" style={{ color: 'var(--muted)' }}>
-              {NOW_PLAYING.artist}
-            </p>
-          </div>
+          {track ? (
+            <>
+              {track.image ? (
+                <img
+                  src={track.image}
+                  alt=""
+                  className="w-10 h-10 rounded flex-shrink-0 object-cover"
+                />
+              ) : (
+                <div
+                  className="w-10 h-10 rounded flex-shrink-0"
+                  style={{ background: 'var(--bg-card)' }}
+                  aria-hidden="true"
+                />
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>
+                  {track.title}
+                </p>
+                <p className="text-xs truncate" style={{ color: 'var(--muted)' }}>
+                  {track.artist}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                className="w-10 h-10 rounded flex-shrink-0"
+                style={{ background: 'var(--bg-card)' }}
+                aria-hidden="true"
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate" style={{ color: 'var(--muted)' }}>
+                  Not playing
+                </p>
+                <p className="text-xs truncate" style={{ color: 'var(--muted)' }}>
+                  Pick a song to start
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Center — controls (hidden on mobile except play) */}
@@ -67,7 +89,7 @@ export function MiniPlayer() {
           </button>
 
           <button
-            onClick={() => setPlaying(p => !p)}
+            onClick={toggle}
             aria-label={playing ? 'Pause' : 'Play'}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-105"
             style={{
@@ -90,7 +112,7 @@ export function MiniPlayer() {
 
         {/* Mobile-only play button */}
         <button
-          onClick={() => setPlaying(p => !p)}
+          onClick={toggle}
           aria-label={playing ? 'Pause' : 'Play'}
           className="lg:hidden w-9 h-9 rounded-full flex items-center justify-center"
           style={{ background: 'var(--accent)', color: '#ffffff' }}

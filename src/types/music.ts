@@ -25,3 +25,17 @@ export interface TrackTag {
   name: string
   url: string
 }
+
+export interface YouTubeResult {
+  videoId: string
+  title: string
+  thumbnail: string
+}
+
+export interface NowPlayingTrack {
+  title: string
+  artist: string
+  image: string
+  videoId: string | null
+  unavailable: boolean
+}

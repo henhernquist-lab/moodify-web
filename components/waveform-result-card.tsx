@@ -1,22 +1,36 @@
 'use client'
 
 import { useState } from 'react'
-import { Play, Pause, Plus, Check } from 'lucide-react'
+import { Play, Pause, Plus, Check, Loader as Loader2 } from 'lucide-react'
+import { useNowPlaying } from '@/src/lib/now-playing'
+import { PlayingIndicator } from '@/components/playing-indicator'
 
 interface WaveformResultCardProps {
   title: string
   artist: string
   duration?: string
   genre?: string
+  image?: string
 }
 
 // 30 bar heights for the waveform
 const BARS = [28, 52, 38, 68, 44, 76, 42, 62, 30, 72, 54, 38, 58, 80, 48, 66, 40, 32, 60, 52, 38, 70, 56, 46, 68, 42, 78, 32, 52, 62]
 
-export function WaveformResultCard({ title, artist, duration, genre }: WaveformResultCardProps) {
-  const [playing, setPlaying] = useState(false)
-  const [saved,   setSaved]   = useState(false)
+export function WaveformResultCard({ title, artist, duration, genre, image }: WaveformResultCardProps) {
+  const [saved, setSaved] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const { track, playing, loading, play, toggle } = useNowPlaying()
+
+  const isCurrentTrack = track?.title === title && track?.artist === artist
+  const isActive = isCurrentTrack && playing
+
+  const handlePlay = () => {
+    if (isCurrentTrack) {
+      toggle()
+    } else {
+      play(title, artist, image ?? '')
+    }
+  }
 
   return (
     <article
@@ -59,12 +73,12 @@ export function WaveformResultCard({ title, artist, duration, genre }: WaveformR
           {BARS.map((h, i) => (
             <div
               key={i}
-              className={`flex-1 rounded-sm wave-bar ${hovered || playing ? 'wave-bar-fast' : ''}`}
+              className={`flex-1 rounded-sm wave-bar ${hovered || isActive ? 'wave-bar-fast' : ''}`}
               style={{
                 height: `${h}%`,
-                backgroundColor: playing ? 'var(--accent)' : 'rgba(124,92,255,0.35)',
+                backgroundColor: isActive ? 'var(--accent)' : 'rgba(124,92,255,0.35)',
                 animationDelay: `${i * 0.038}s`,
-                animationPlayState: playing ? 'running' : (hovered ? 'running' : 'paused'),
+                animationPlayState: isActive ? 'running' : (hovered ? 'running' : 'paused'),
                 transition: 'background-color 150ms ease',
               }}
             />
@@ -72,10 +86,10 @@ export function WaveformResultCard({ title, artist, duration, genre }: WaveformR
 
           {/* Play button */}
           <button
-            onClick={() => setPlaying(p => !p)}
-            aria-label={playing ? 'Pause' : 'Play'}
+            onClick={handlePlay}
+            aria-label={isActive ? 'Pause' : 'Play'}
             className="absolute inset-0 flex items-center justify-center transition-opacity duration-150"
-            style={{ opacity: hovered || playing ? 1 : 0 }}
+            style={{ opacity: hovered || isActive ? 1 : 0 }}
           >
             <span
               className="w-9 h-9 rounded-full flex items-center justify-center"
@@ -84,10 +98,15 @@ export function WaveformResultCard({ title, artist, duration, genre }: WaveformR
                 boxShadow: '0 0 12px rgba(124,92,255,0.3)',
               }}
             >
-              {playing
-                ? <Pause size={14} style={{ color: '#ffffff' }} />
-                : <Play  size={14} style={{ color: '#ffffff' }} className="ml-0.5" />
-              }
+              {loading && isCurrentTrack ? (
+                <Loader2 size={14} className="animate-spin" style={{ color: '#ffffff' }} />
+              ) : isActive ? (
+                <Pause size={14} style={{ color: '#ffffff' }} />
+              ) : isCurrentTrack ? (
+                <PlayingIndicator />
+              ) : (
+                <Play size={14} style={{ color: '#ffffff' }} className="ml-0.5" />
+              )}
             </span>
           </button>
         </div>

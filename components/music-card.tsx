@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Play, Heart } from 'lucide-react'
-import Image from 'next/image'
+import { Play, Heart, Loader as Loader2 } from 'lucide-react'
+import { useNowPlaying } from '@/src/lib/now-playing'
+import { PlayingIndicator } from '@/components/playing-indicator'
 
 interface MusicCardProps {
   title: string
   artist: string
   albumColor?: string
+  image?: string
   /** 'portrait' = 160×200, 'landscape' = full-width editorial */
   variant?: 'portrait' | 'landscape'
   showSaveButton?: boolean
@@ -17,11 +19,20 @@ export function MusicCard({
   title,
   artist,
   albumColor = '#2a1f5e',
+  image,
   variant = 'portrait',
   showSaveButton = false,
 }: MusicCardProps) {
   const [liked, setLiked] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const { track, playing, loading, play } = useNowPlaying()
+
+  const isCurrentTrack = track?.title === title && track?.artist === artist
+
+  const handlePlay = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    play(title, artist, image ?? '')
+  }
 
   if (variant === 'landscape') {
     return (
@@ -52,10 +63,16 @@ export function MusicCard({
             style={{
               background: 'var(--accent)',
               color: '#ffffff',
-              opacity: hovered ? 1 : 0,
+              opacity: hovered || isCurrentTrack ? 1 : 0,
             }}
           >
-            <Play size={14} className="ml-0.5" />
+            {loading && isCurrentTrack ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : isCurrentTrack && playing ? (
+              <PlayingIndicator />
+            ) : (
+              <Play size={14} className="ml-0.5" />
+            )}
           </div>
         </div>
       </article>
@@ -85,14 +102,21 @@ export function MusicCard({
         {/* Play button overlay on hover */}
         <div
           className="absolute inset-0 flex items-center justify-center transition-opacity duration-150"
-          style={{ opacity: hovered ? 1 : 0 }}
+          style={{ opacity: hovered || isCurrentTrack ? 1 : 0 }}
         >
-          <div
+          <button
+            onClick={handlePlay}
             className="w-9 h-9 rounded-full flex items-center justify-center"
             style={{ background: 'rgba(124,92,255,0.9)' }}
           >
-            <Play size={14} style={{ color: '#ffffff' }} className="ml-0.5" />
-          </div>
+            {loading && isCurrentTrack ? (
+              <Loader2 size={14} className="animate-spin" style={{ color: '#ffffff' }} />
+            ) : isCurrentTrack ? (
+              <PlayingIndicator />
+            ) : (
+              <Play size={14} style={{ color: '#ffffff' }} className="ml-0.5" />
+            )}
+          </button>
         </div>
       </div>
 
