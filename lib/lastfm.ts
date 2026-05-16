@@ -220,7 +220,7 @@ export function mapTagsToMoods(tags: string[]): string[] {
     euphoric: 'Euphoric',
     happy: 'Euphoric',
     joyful: 'Euphoric',
-    feel-good: 'Euphoric',
+    'feel-good': 'Euphoric',
     
     // Nostalgic
     nostalgic: 'Nostalgic',
