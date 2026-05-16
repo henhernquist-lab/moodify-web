@@ -1,5 +1,10 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { MusicCard } from '@/components/music-card'
 import { ScrollRow } from '@/components/scroll-row'
+import { getSavedPlaylistObjects } from '@/src/lib/playlists'
+import type { SavedPlaylist } from '@/src/lib/playlists'
 
 const RECENTLY_PLAYED = [
   { title: 'Redbone',          artist: 'Childish Gambino', albumColor: '#4a1c2e' },
@@ -28,14 +33,26 @@ const TRENDING = [
   { title: 'Not Like Us',      artist: 'Kendrick Lamar',   albumColor: '#2a1a1a' },
 ]
 
-const VIBE_MIXES = [
-  { title: 'Late Night Drive',     artist: 'Curated for you · 24 songs', albumColor: '#1a1a3e' },
-  { title: 'Melancholic Mondays',  artist: 'Curated for you · 18 songs', albumColor: '#2a1a2e' },
-  { title: 'Focus State',          artist: 'Curated for you · 31 songs', albumColor: '#0e2a2a' },
-  { title: 'Sunday Slow Mornings', artist: 'Curated for you · 22 songs', albumColor: '#2a2a1a' },
+const PLACEHOLDER_MIXES = [
+  { title: 'Generate your first vibe mix', artist: 'Head to Mood Search to create one', albumColor: '#1a1a3e' },
+  { title: 'Your saved mixes appear here', artist: 'Discover music that matches your mood', albumColor: '#0e2a2a' },
 ]
 
 export default function HomePage() {
+  const [savedPlaylists, setSavedPlaylists] = useState<SavedPlaylist[]>([])
+
+  useEffect(() => {
+    setSavedPlaylists(getSavedPlaylistObjects())
+  }, [])
+
+  const vibeMixes = savedPlaylists.length > 0
+    ? savedPlaylists.map((pl) => ({
+        title: pl.name,
+        artist: `${pl.tracks.length} songs · ${pl.mood} · ${pl.energy}`,
+        albumColor: '#1a1a3e',
+      }))
+    : PLACEHOLDER_MIXES
+
   return (
     <div className="px-6 py-8 lg:px-8 lg:py-10 max-w-[1200px]">
 
@@ -95,11 +112,20 @@ export default function HomePage() {
       <section>
         <div className="flex items-baseline justify-between mb-6">
           <h2 className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>AI Vibe Mixes</h2>
-          <a href="#" className="text-xs" style={{ color: 'var(--muted)' }}>See all</a>
+          {savedPlaylists.length > 0 && (
+            <a href="/mood-search" className="text-xs" style={{ color: 'var(--muted)' }}>Create new</a>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {VIBE_MIXES.map(card => (
-            <MusicCard key={card.title} {...card} variant="landscape" />
+          {vibeMixes.map(card => (
+            <a
+              key={card.title}
+              href="/mood-search"
+              className="block"
+              style={{ textDecoration: 'none' }}
+            >
+              <MusicCard {...card} variant="landscape" />
+            </a>
           ))}
         </div>
       </section>

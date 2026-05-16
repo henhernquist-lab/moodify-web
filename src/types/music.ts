@@ -39,3 +39,19 @@ export interface NowPlayingTrack {
   videoId: string | null
   unavailable: boolean
 }
+
+export interface MoodPlaylistTrack {
+  name: string
+  artist: string
+  image: string
+  duration: string
+}
+
+export interface MoodPlaylist {
+  name: string
+  mood: string
+  energy: string
+  intensity: number
+  tracks: MoodPlaylistTrack[]
+  createdAt: string
+}

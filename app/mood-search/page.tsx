@@ -1,23 +1,37 @@
 'use client'
 
-import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import { Search, Bookmark } from 'lucide-react'
 import { WaveformResultCard } from '@/components/waveform-result-card'
+import { generateMoodPlaylist, savePlaylist } from '@/src/lib/playlists'
+import type { MoodPlaylistTrack } from '@/src/types/music'
+import { useToast } from '@/hooks/use-toast'
 
 const MOODS    = ['Melancholic', 'Energetic', 'Focused', 'Euphoric', 'Nostalgic', 'Dark', 'Peaceful', 'Rebellious']
 const ENERGIES = ['Low', 'Medium', 'High']
 
-const RESULTS = [
-  { title: 'Self Control',          artist: 'Frank Ocean',           duration: '4:12', genre: 'R&B' },
-  { title: 'The Night Will Always Win', artist: 'Manchester Orchestra', duration: '3:56', genre: 'Indie' },
-  { title: 'Slow Burn',             artist: 'Kacey Musgraves',        duration: '3:40', genre: 'Pop' },
-  { title: 'Lost in the Light',     artist: 'Bahamas',                duration: '4:01', genre: 'Folk' },
-  { title: 'Golden',                artist: 'Harry Styles',           duration: '3:28', genre: 'Pop' },
-  { title: 'Liability',             artist: 'Lorde',                  duration: '3:57', genre: 'Indie Pop' },
-  { title: "Comptine d'un autre été", artist: 'Yann Tiersen',         duration: '2:32', genre: 'Classical' },
-  { title: 'Motion Sickness',       artist: 'Phoebe Bridgers',        duration: '3:35', genre: 'Indie' },
-  { title: 'Retrograde',            artist: 'James Blake',            duration: '4:10', genre: 'Electronic' },
-]
+function ShimmerCard() {
+  return (
+    <div
+      className="rounded-lg animate-pulse"
+      style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
+    >
+      <div className="p-5">
+        <div className="h-4 w-24 rounded mb-2" style={{ background: 'var(--border)' }} />
+        <div className="h-3 w-16 rounded mb-4" style={{ background: 'var(--border)' }} />
+        <div className="flex items-end gap-[2px] h-14">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-sm"
+              style={{ background: 'var(--border)', height: `${20 + Math.random() * 60}%` }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function MoodSearchPage() {
   const [query,     setQuery]     = useState('')
@@ -27,10 +41,48 @@ export default function MoodSearchPage() {
   const [intensity, setIntensity] = useState(5)
   const [searched,  setSearched]  = useState(false)
 
+  // Playlist state
+  const [playlistTracks, setPlaylistTracks] = useState<MoodPlaylistTrack[]>([])
+  const [playlistLoading, setPlaylistLoading] = useState(false)
+  const [playlistGenerated, setPlaylistGenerated] = useState(false)
+  const [playlistSaved, setPlaylistSaved] = useState(false)
+
+  const { toast } = useToast()
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (!query.trim()) return
     setSearched(true)
+    setPlaylistGenerated(false)
+  }
+
+  const handleDiscover = useCallback(async () => {
+    if (!mood || !energy) return
+    setPlaylistLoading(true)
+    setPlaylistGenerated(false)
+    setPlaylistSaved(false)
+
+    const tracks = await generateMoodPlaylist(mood, energy, intensity, 20)
+    setPlaylistTracks(tracks)
+    setPlaylistLoading(false)
+    setPlaylistGenerated(true)
+  }, [mood, energy, intensity])
+
+  const handleSavePlaylist = () => {
+    if (!mood || !energy || playlistTracks.length === 0) return
+    savePlaylist({
+      name: `Your ${mood} playlist`,
+      mood,
+      energy,
+      intensity,
+      tracks: playlistTracks,
+      createdAt: new Date().toISOString(),
+    })
+    setPlaylistSaved(true)
+    toast({
+      title: 'Playlist saved to your Library',
+      duration: 3000,
+    })
   }
 
   return (
@@ -149,11 +201,11 @@ export default function MoodSearchPage() {
           </div>
         </div>
 
-        {/* Discover button */}
-        <div className="flex justify-center lg:justify-start">
+        {/* Buttons row */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
           <button
             type="submit"
-            className="w-full lg:w-[280px] h-12 rounded-lg text-sm font-medium transition-all duration-150"
+            className="w-full sm:w-auto sm:flex-1 lg:w-[200px] h-12 rounded-lg text-sm font-medium transition-all duration-150"
             style={{
               background: 'var(--accent)',
               color: '#ffffff',
@@ -170,12 +222,37 @@ export default function MoodSearchPage() {
               el.style.filter = 'brightness(1)'
             }}
           >
+            Find Similar
+          </button>
+          <button
+            type="button"
+            onClick={handleDiscover}
+            disabled={!mood || !energy}
+            className="w-full sm:w-auto sm:flex-1 lg:w-[200px] h-12 rounded-lg text-sm font-medium transition-all duration-150"
+            style={{
+              background: mood && energy ? 'var(--accent)' : 'var(--bg-card)',
+              color: mood && energy ? '#ffffff' : 'var(--muted)',
+              border: `1px solid ${mood && energy ? 'var(--accent)' : 'var(--border)'}`,
+              opacity: mood && energy ? 1 : 0.5,
+            }}
+            onMouseEnter={e => {
+              if (!mood || !energy) return
+              const el = e.currentTarget
+              el.style.boxShadow = '0 0 12px rgba(124,92,255,0.3)'
+              el.style.filter = 'brightness(1.1)'
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget
+              el.style.boxShadow = '0 0 0 0 rgba(124,92,255,0)'
+              el.style.filter = 'brightness(1)'
+            }}
+          >
             Discover
           </button>
         </div>
       </form>
 
-      {/* Results */}
+      {/* Find Similar results */}
       {searched && (
         <section className="mt-12">
           <h2 className="text-base font-semibold mb-6" style={{ color: 'var(--foreground)' }}>
@@ -190,6 +267,89 @@ export default function MoodSearchPage() {
         </section>
       )}
 
+      {/* Mood Playlist results */}
+      {playlistLoading && (
+        <section className="mt-12">
+          <h2 className="text-base font-semibold mb-6" style={{ color: 'var(--foreground)' }}>
+            Generating your playlist...
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ShimmerCard key={i} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {playlistGenerated && !playlistLoading && (
+        <section className="mt-12">
+          <div className="flex items-start justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>
+                Your {mood} playlist
+              </h2>
+              <div className="flex items-center gap-2 mt-1.5">
+                {energy && (
+                  <span
+                    className="text-[11px] px-2 py-0.5 rounded"
+                    style={{ background: 'rgba(124,92,255,0.1)', color: 'var(--muted)', border: '1px solid var(--border)' }}
+                  >
+                    {energy}
+                  </span>
+                )}
+                <span
+                  className="text-[11px] px-2 py-0.5 rounded"
+                  style={{ background: 'rgba(124,92,255,0.1)', color: 'var(--muted)', border: '1px solid var(--border)' }}
+                >
+                  Intensity {intensity}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={handleSavePlaylist}
+              disabled={playlistSaved}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150"
+              style={{
+                background: playlistSaved ? 'rgba(124,92,255,0.15)' : 'transparent',
+                color: playlistSaved ? 'var(--accent)' : 'var(--accent)',
+                border: `1px solid ${playlistSaved ? 'var(--accent)' : 'var(--accent)'}`,
+                opacity: playlistSaved ? 0.6 : 1,
+              }}
+            >
+              <Bookmark size={14} fill={playlistSaved ? 'var(--accent)' : 'none'} />
+              {playlistSaved ? 'Saved' : 'Save Playlist'}
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {playlistTracks.map((track, i) => (
+              <div
+                key={`${track.name}-${track.artist}`}
+                className="stagger-fade-in"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <WaveformResultCard
+                  title={track.name}
+                  artist={track.artist}
+                  duration={track.duration}
+                  image={track.image}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
+
+const RESULTS = [
+  { title: 'Self Control',          artist: 'Frank Ocean',           duration: '4:12', genre: 'R&B' },
+  { title: 'The Night Will Always Win', artist: 'Manchester Orchestra', duration: '3:56', genre: 'Indie' },
+  { title: 'Slow Burn',             artist: 'Kacey Musgraves',        duration: '3:40', genre: 'Pop' },
+  { title: 'Lost in the Light',     artist: 'Bahamas',                duration: '4:01', genre: 'Folk' },
+  { title: 'Golden',                artist: 'Harry Styles',           duration: '3:28', genre: 'Pop' },
+  { title: 'Liability',             artist: 'Lorde',                  duration: '3:57', genre: 'Indie Pop' },
+  { title: "Comptine d'un autre été", artist: 'Yann Tiersen',         duration: '2:32', genre: 'Classical' },
+  { title: 'Motion Sickness',       artist: 'Phoebe Bridgers',        duration: '3:35', genre: 'Indie' },
+  { title: 'Retrograde',            artist: 'James Blake',            duration: '4:10', genre: 'Electronic' },
+]

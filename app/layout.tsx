@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { AppShell } from '@/components/app-shell'
 import { NowPlayingProvider } from '@/src/lib/now-playing'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <NowPlayingProvider>
           <AppShell>{children}</AppShell>
+          <Toaster />
         </NowPlayingProvider>
       </body>
     </html>
