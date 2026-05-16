@@ -1,5 +1,6 @@
 import { MusicCard } from '@/components/music-card'
 import { ScrollRow } from '@/components/scroll-row'
+import { RecentSearches } from '@/components/recent-searches'
 
 const RECENTLY_PLAYED = [
   { title: 'Redbone',          artist: 'Childish Gambino', albumColor: '#4a1c2e' },
@@ -35,6 +36,7 @@ const VIBE_MIXES = [
   { title: 'Sunday Slow Mornings', artist: 'Curated for you · 22 songs', albumColor: '#2a2a1a' },
 ]
 
+
 export default function HomePage() {
   return (
     <div className="px-6 py-8 lg:px-8 lg:py-10 max-w-[1200px]">
@@ -51,6 +53,9 @@ export default function HomePage() {
           {"Here's what matches your vibe tonight."}
         </p>
       </header>
+
+      {/* Recently Searched (from localStorage) */}
+      <RecentSearches />
 
       {/* Recently Played */}
       <section className="mb-12">

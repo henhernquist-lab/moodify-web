@@ -8,12 +8,13 @@ interface WaveformResultCardProps {
   artist: string
   duration?: string
   genre?: string
+  coverArt?: string
 }
 
 // 30 bar heights for the waveform
 const BARS = [28, 52, 38, 68, 44, 76, 42, 62, 30, 72, 54, 38, 58, 80, 48, 66, 40, 32, 60, 52, 38, 70, 56, 46, 68, 42, 78, 32, 52, 62]
 
-export function WaveformResultCard({ title, artist, duration, genre }: WaveformResultCardProps) {
+export function WaveformResultCard({ title, artist, duration, genre, coverArt }: WaveformResultCardProps) {
   const [playing, setPlaying] = useState(false)
   const [saved,   setSaved]   = useState(false)
   const [hovered, setHovered] = useState(false)
@@ -32,6 +33,19 @@ export function WaveformResultCard({ title, artist, duration, genre }: WaveformR
       onMouseLeave={() => setHovered(false)}
     >
       <div className="p-5">
+        {/* Cover art (if available) */}
+        {coverArt && (
+          <div className="mb-4 -mx-5 -mt-5 h-32">
+            <img
+              src={coverArt}
+              alt={`${title} by ${artist}`}
+              className="w-full h-full object-cover"
+              onError={e => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none'
+              }}
+            />
+          </div>
+        )}
         {/* Header row */}
         <div className="flex items-start justify-between gap-2 mb-4">
           <div className="min-w-0">
