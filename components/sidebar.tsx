@@ -1,19 +1,31 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Home, Compass, Search, Library, User } from 'lucide-react'
+import { useAuth } from '@/src/context/AuthContext'
+import { signOut } from '@/src/lib/auth'
+import * as Popover from '@radix-ui/react-popover';
 
 const NAV_ITEMS = [
-  { label: 'Home',        href: '/',            icon: Home },
-  { label: 'Discover',   href: '/discover',    icon: Compass },
-  { label: 'Mood Search',href: '/mood-search', icon: Search },
-  { label: 'Library',    href: '/library',     icon: Library },
-  { label: 'Profile',    href: '/profile',     icon: User },
+  { label: 'Home', href: '/', icon: Home, protected: false },
+  { label: 'Discover', href: '/discover', icon: Compass, protected: false },
+  { label: 'Mood Search',href: '/mood-search', icon: Search, protected: false },
+  { label: 'Library', href: '/library', icon: Library, protected: true },
+  { label: 'Profile', href: '/profile', icon: User, protected: true },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, signIn } = useAuth()
+
+  const handleNavClick = (e, href, isProtected) => {
+    if (isProtected && !user) {
+      e.preventDefault()
+      signIn()
+    }
+  }
 
   return (
     <aside
@@ -30,18 +42,19 @@ export function Sidebar() {
 
       {/* Nav links */}
       <nav className="flex-1 px-3 flex flex-col gap-0.5">
-        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+        {NAV_ITEMS.map(({ label, href, icon: Icon, protected: isProtected }) => {
           const active = pathname === href
           return (
             <Link
               key={href}
               href={href}
+              onClick={(e) => handleNavClick(e, href, isProtected)}
               className="relative flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-100"
               style={{
-                color:           active ? '#ffffff' : 'var(--muted)',
-                background:      active ? 'rgba(124,92,255,0.12)' : 'transparent',
-                borderLeft:      active ? '2px solid var(--accent)' : '2px solid transparent',
-                paddingLeft:     active ? '10px' : '12px',
+                color: active ? '#ffffff' : 'var(--muted)',
+                background: active ? 'rgba(124,92,255,0.12)' : 'transparent',
+                borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent',
+                paddingLeft: active ? '10px' : '12px',
               }}
               aria-current={active ? 'page' : undefined}
             >
@@ -54,21 +67,29 @@ export function Sidebar() {
 
       {/* User avatar */}
       <div className="px-3 pb-6 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-        <Link
-          href="/profile"
-          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/5 transition-colors duration-100"
-        >
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
-            style={{ background: 'var(--bg-card)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
-          >
-            JD
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>Jamie D.</p>
-            <p className="text-xs truncate" style={{ color: 'var(--muted)' }}>Free plan</p>
-          </div>
-        </Link>
+        {user ? (
+          <Popover.Root>
+            <Popover.Trigger className="w-full">
+              <div className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/5 transition-colors duration-100 w-full">
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${user.photoURL || '/placeholder-user.jpg'})`, color: 'var(--foreground)', border: '1px solid var(--border)' }}
+                >
+                  {!user.photoURL && user.displayName?.charAt(0)}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate text-left" style={{ color: 'var(--foreground)' }}>{user.displayName}</p>
+                </div>
+              </div>
+            </Popover.Trigger>
+            <Popover.Content className="w-48 bg-[#11131A] border border-[#2A2D3E] rounded-md shadow-lg p-1">
+              <Link href="/profile" className="block px-3 py-2 text-sm text-white hover:bg-white/10 rounded-md">Profile</Link>
+              <button onClick={() => signOut()} className="w-full text-left px-3 py-2 text-sm text-white hover:bg-white/10 rounded-md">Sign Out</button>
+            </Popover.Content>
+          </Popover.Root>
+        ) : (
+          <button onClick={() => signIn()} className="w-full p-3 bg-[#7C5CFF] rounded text-white font-bold">Sign In</button>
+        )}
       </div>
     </aside>
   )

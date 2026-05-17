@@ -4,6 +4,7 @@ import './globals.css'
 import { AppShell } from '@/components/app-shell'
 import { NowPlayingProvider } from '@/src/lib/now-playing'
 import { Toaster } from '@/components/ui/toaster'
+import { AuthProvider } from '@/src/context/AuthContext'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,10 +33,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body>
-        <NowPlayingProvider>
-          <AppShell>{children}</AppShell>
-          <Toaster />
-        </NowPlayingProvider>
+        <AuthProvider>
+          <NowPlayingProvider>
+            <AppShell>{children}</AppShell>
+            <Toaster />
+          </NowPlayingProvider>
+        </AuthProvider>
       </body>
     </html>
   )
