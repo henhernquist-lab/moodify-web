@@ -17,7 +17,7 @@ interface SpotifyTrack {
 interface SpotifyArtist {
   id: string;
   name: string;
-  imageUrl: string | null;
+  image: string | null;
   spotifyUrl: string;
 }
 
@@ -93,7 +93,7 @@ function mapSpotifyTrackToAppTrack(item: any): SpotifyTrack {
     name: item.name,
     artist: item.artists[0]?.name || 'Unknown Artist',
     album: item.album?.name || 'Unknown Album',
-    coverArt: item.album?.images[1]?.url || item.album?.images[0]?.url || null,
+    coverArt: item.album?.images[1]?.url || null,
     previewUrl: item.preview_url,
     spotifyUrl: item.external_urls?.spotify,
     durationMs: item.duration_ms,
@@ -162,7 +162,7 @@ export async function getUserTopArtists(): Promise<SpotifyArtist[]> {
     return data.items.map((item: any) => ({
       id: item.id,
       name: item.name,
-      imageUrl: item.images[0]?.url || null,
+      image: item.images[1]?.url || null,
       spotifyUrl: item.external_urls?.spotify,
     }));
   }

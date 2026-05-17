@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Play, Pause, SkipBack, SkipForward, Heart, Volume2, ListMusic } from 'lucide-react'
 import { useNowPlaying } from '@/src/lib/now-playing'
+import { SpotifyImage } from '@/components/spotify-image'
 
 export function MiniPlayer() {
   const { track, playing, progress, toggle } = useNowPlaying()
@@ -37,19 +38,9 @@ export function MiniPlayer() {
         <div className="flex items-center gap-3 min-w-0 flex-1 lg:flex-none lg:w-64">
           {track ? (
             <>
-              {track.image ? (
-                <img
-                  src={track.image}
-                  alt=""
-                  className="w-10 h-10 rounded flex-shrink-0 object-cover"
-                />
-              ) : (
-                <div
-                  className="w-10 h-10 rounded flex-shrink-0"
-                  style={{ background: 'var(--bg-card)' }}
-                  aria-hidden="true"
-                />
-              )}
+              <div className="w-10 h-10 flex-shrink-0">
+                <SpotifyImage src={track.image} alt={track.title} />
+              </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>
                   {track.title}
@@ -61,11 +52,9 @@ export function MiniPlayer() {
             </>
           ) : (
             <>
-              <div
-                className="w-10 h-10 rounded flex-shrink-0"
-                style={{ background: 'var(--bg-card)' }}
-                aria-hidden="true"
-              />
+              <div className="w-10 h-10 flex-shrink-0">
+                <SpotifyImage src={null} />
+              </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate" style={{ color: 'var(--muted)' }}>
                   Not playing
