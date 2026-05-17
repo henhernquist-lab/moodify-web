@@ -35,7 +35,7 @@ export interface YouTubeResult {
 export interface NowPlayingTrack {
   title: string
   artist: string
-  image: string
+  image: string | null
   videoId: string | null
   unavailable: boolean
 }
@@ -43,7 +43,7 @@ export interface NowPlayingTrack {
 export interface MoodPlaylistTrack {
   name: string
   artist: string
-  image: string
+  image: string | null
   duration: string
 }
 

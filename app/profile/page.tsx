@@ -4,14 +4,15 @@ import { useState } from 'react'
 import { X, Music2 } from 'lucide-react'
 import { TasteRadar } from '@/components/taste-radar'
 import { ScrollRow } from '@/components/scroll-row'
+import { SpotifyImage } from '@/components/spotify-image'
 
 const TOP_ARTISTS = [
-  { name: 'Frank Ocean',      color: '#1a2e2e' },
-  { name: 'Lorde',            color: '#2a1a2e' },
-  { name: 'Bon Iver',         color: '#1e1e2e' },
-  { name: 'James Blake',      color: '#1a1e3a' },
-  { name: 'Phoebe Bridgers',  color: '#2a1e1e' },
-  { name: 'Kacey Musgraves',  color: '#2a3a1e' },
+  { name: 'Frank Ocean',      image: null },
+  { name: 'Lorde',            image: null },
+  { name: 'Bon Iver',         image: null },
+  { name: 'James Blake',      image: null },
+  { name: 'Phoebe Bridgers',  image: null },
+  { name: 'Kacey Musgraves',  image: null },
 ]
 
 const STATS = [
@@ -71,11 +72,8 @@ export default function ProfilePage() {
 
       {/* Profile header */}
       <header className="flex items-center gap-4 mb-10">
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center text-base font-semibold flex-shrink-0"
-          style={{ background: 'var(--bg-card)', color: 'var(--foreground)', border: '2px solid var(--border)' }}
-        >
-          JD
+        <div className="w-16 h-16 flex-shrink-0">
+          <SpotifyImage src={null} alt="JD" type="artist" />
         </div>
         <div>
           <p className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>Jamie D.</p>
@@ -154,18 +152,16 @@ export default function ProfilePage() {
             Top Artists
           </h2>
           <div className="flex flex-col gap-1">
-            {TOP_ARTISTS.map(({ name, color }) => (
+            {TOP_ARTISTS.map(({ name, image }) => (
               <div
                 key={name}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-100 cursor-pointer"
                 onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-card)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <div
-                  className="w-9 h-9 rounded-full flex-shrink-0"
-                  style={{ background: color }}
-                  aria-hidden="true"
-                />
+                <div className="w-9 h-9 flex-shrink-0">
+                  <SpotifyImage src={image} alt={name} type="artist" />
+                </div>
                 <p className="text-sm" style={{ color: 'var(--foreground)' }}>{name}</p>
               </div>
             ))}

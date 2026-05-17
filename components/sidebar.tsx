@@ -6,6 +6,7 @@ import { Home, Compass, Search, Library, User } from 'lucide-react'
 import { useAuth } from '@/src/context/AuthContext'
 import { signOut } from '@/src/lib/auth'
 import * as Popover from '@radix-ui/react-popover';
+import { SpotifyImage } from '@/components/spotify-image';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/', icon: Home, protected: false },
@@ -71,11 +72,8 @@ export function Sidebar() {
           <Popover.Root>
             <Popover.Trigger className="w-full">
               <div className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/5 transition-colors duration-100 w-full">
-                <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${user.photoURL || '/placeholder-user.jpg'})`, color: 'var(--foreground)', border: '1px solid var(--border)' }}
-                >
-                  {!user.photoURL && user.displayName?.charAt(0)}
+                <div className="w-7 h-7 flex-shrink-0">
+                  <SpotifyImage src={user.photoURL} alt={user.displayName || ''} type="artist" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate text-left" style={{ color: 'var(--foreground)' }}>{user.displayName}</p>

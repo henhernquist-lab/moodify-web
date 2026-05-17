@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Play, Heart, Loader as Loader2 } from 'lucide-react'
 import { useNowPlaying } from '@/src/lib/now-playing'
 import { PlayingIndicator } from '@/components/playing-indicator'
+import { SpotifyImage } from '@/components/spotify-image'
 
 interface MusicCardProps {
   title: string
@@ -39,7 +40,7 @@ export function MusicCard({
       <article
         className="relative rounded-lg overflow-hidden cursor-pointer"
         style={{
-          background: `linear-gradient(135deg, ${albumColor}dd 0%, var(--bg-card) 60%)`,
+          background: `linear-gradient(135deg, ${image ? '#171A22' : albumColor}dd 0%, var(--bg-card) 60%)`,
           border: '1px solid var(--border)',
           transition: 'transform 150ms ease, box-shadow 150ms ease',
           transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
@@ -49,11 +50,9 @@ export function MusicCard({
         onMouseLeave={() => setHovered(false)}
       >
         <div className="flex items-center gap-4 p-5">
-          <div
-            className="w-16 h-16 rounded flex-shrink-0"
-            style={{ background: albumColor }}
-            aria-hidden="true"
-          />
+          <div className="w-16 h-16 flex-shrink-0">
+            <SpotifyImage src={image} alt={title} />
+          </div>
           <div className="min-w-0 flex-1">
             <p className="font-medium text-sm truncate" style={{ color: 'var(--foreground)' }}>{title}</p>
             <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--muted)' }}>{artist}</p>
@@ -96,9 +95,9 @@ export function MusicCard({
       {/* Album art area — 65% of height (approx 104px of 160px total) */}
       <div
         className="relative w-full"
-        style={{ height: '104px', background: albumColor }}
-        aria-hidden="true"
+        style={{ height: '104px' }}
       >
+        <SpotifyImage src={image} alt={title} />
         {/* Play button overlay on hover */}
         <div
           className="absolute inset-0 flex items-center justify-center transition-opacity duration-150"

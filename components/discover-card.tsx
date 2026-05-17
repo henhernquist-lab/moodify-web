@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Play, Heart, Loader as Loader2 } from 'lucide-react'
 import { useNowPlaying } from '@/src/lib/now-playing'
 import { PlayingIndicator } from '@/components/playing-indicator'
+import { SpotifyImage } from '@/components/spotify-image'
 
 interface DiscoverCardProps {
   title: string
@@ -41,9 +42,9 @@ export function DiscoverCard({ title, artist, albumColor = '#1a1a3a', genre, ima
       {/* Album art — taller, editorial feel */}
       <div
         className="relative w-full"
-        style={{ height: '140px', background: albumColor }}
-        aria-hidden="true"
+        style={{ height: '140px' }}
       >
+        <SpotifyImage src={image} alt={title} />
         {genre && (
           <span
             className="absolute top-3 left-3 text-[10px] font-medium px-2 py-0.5 rounded"

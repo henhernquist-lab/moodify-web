@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Play, Pause, Plus, Check, Loader as Loader2 } from 'lucide-react'
 import { useNowPlaying } from '@/src/lib/now-playing'
 import { PlayingIndicator } from '@/components/playing-indicator'
+import { SpotifyImage } from '@/components/spotify-image'
 
 interface WaveformResultCardProps {
   title: string
@@ -45,7 +46,13 @@ export function WaveformResultCard({ title, artist, duration, genre, image }: Wa
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="p-5">
+      <div className="p-5 flex gap-4">
+        {/* Album Art */}
+        <div className="w-16 h-16 flex-shrink-0">
+          <SpotifyImage src={image} alt={title} />
+        </div>
+
+        <div className="flex-1 min-w-0">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2 mb-4">
           <div className="min-w-0">
@@ -127,6 +134,7 @@ export function WaveformResultCard({ title, artist, duration, genre, image }: Wa
             )}
           </div>
         )}
+        </div>
       </div>
     </article>
   )
