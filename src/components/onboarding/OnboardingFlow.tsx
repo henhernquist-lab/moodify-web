@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { saveOnboardingData, completeOnboarding } from '../lib/auth';
-import { getCurrentUser } from '../lib/auth';
+import { saveOnboardingData, completeOnboarding } from '../../lib/auth';
+import { getCurrentUser } from '../../lib/auth';
 
 const StepIndicator = ({ currentStep }) => {
     return (
