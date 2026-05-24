@@ -331,7 +331,7 @@ export default function MoodSearchPage() {
                   title={track.name}
                   artist={track.artist}
                   duration={track.duration}
-                  image={track.image}
+                  image={track.image ?? undefined}
                 />
               </div>
             ))}

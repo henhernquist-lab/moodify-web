@@ -1,9 +1,20 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { saveOnboardingData, completeOnboarding } from '../lib/auth';
-import { getCurrentUser } from '../lib/auth';
+'use client';
 
-const StepIndicator = ({ currentStep }) => {
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { saveOnboardingData, completeOnboarding } from '../../lib/auth';
+import { getCurrentUser } from '../../lib/auth';
+
+interface Artist {
+    id: string;
+    name: string;
+    images: { url: string }[];
+    genres: string[];
+}
+
+type EnergyPreference = string | null;
+
+const StepIndicator = ({ currentStep }: { currentStep: number }) => {
     return (
         <div className="flex items-center justify-center space-x-2">
             <div className={`w-2 h-2 rounded-full ${currentStep >= 1 ? 'bg-[#7C5CFF]' : 'bg-[#1F2230]'}`}></div>
@@ -14,9 +25,15 @@ const StepIndicator = ({ currentStep }) => {
     );
 };
 
-const FavoriteArtistsStep = ({ onNext, artists, setArtists }) => {
+interface FavoriteArtistsStepProps {
+    onNext: () => void;
+    artists: Artist[];
+    setArtists: Dispatch<SetStateAction<Artist[]>>;
+}
+
+const FavoriteArtistsStep = ({ onNext, artists, setArtists }: FavoriteArtistsStepProps) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState<Artist[]>([]);
     const canNext = artists.length >= 5;
 
     useEffect(() => {
@@ -36,7 +53,7 @@ const FavoriteArtistsStep = ({ onNext, artists, setArtists }) => {
         };
     }, [searchTerm]);
 
-    const addArtist = (artist) => {
+    const addArtist = (artist: Artist) => {
         if (artists.length < 10 && !artists.find(a => a.id === artist.id)) {
             setArtists([...artists, artist]);
             setSearchTerm('');
@@ -44,7 +61,7 @@ const FavoriteArtistsStep = ({ onNext, artists, setArtists }) => {
         }
     };
 
-    const removeArtist = (artistId) => {
+    const removeArtist = (artistId: string) => {
         setArtists(artists.filter(a => a.id !== artistId));
     };
 
@@ -86,11 +103,17 @@ const FavoriteArtistsStep = ({ onNext, artists, setArtists }) => {
     );
 };
 
-const FavoriteGenresStep = ({ onNext, genres, setGenres }) => {
+interface FavoriteGenresStepProps {
+    onNext: () => void;
+    genres: string[];
+    setGenres: Dispatch<SetStateAction<string[]>>;
+}
+
+const FavoriteGenresStep = ({ onNext, genres, setGenres }: FavoriteGenresStepProps) => {
     const allGenres = ['Hip-Hop', 'Electronic', 'Indie', 'R&B', 'Rock', 'Pop', 'Jazz', 'Lo-Fi', 'Soul', 'Metal', 'Classical', 'Reggae'];
     const canNext = genres.length >= 3;
 
-    const toggleGenre = (genre) => {
+    const toggleGenre = (genre: string) => {
         if (genres.includes(genre)) {
             setGenres(genres.filter(g => g !== genre));
         } else {
@@ -117,7 +140,13 @@ const FavoriteGenresStep = ({ onNext, genres, setGenres }) => {
     );
 };
 
-const EnergyPreferenceStep = ({ onFinish, energy, setEnergy }) => {
+interface EnergyPreferenceStepProps {
+    onFinish: () => void;
+    energy: EnergyPreference;
+    setEnergy: Dispatch<SetStateAction<EnergyPreference>>;
+}
+
+const EnergyPreferenceStep = ({ onFinish, energy, setEnergy }: EnergyPreferenceStepProps) => {
     const energies = [
         { title: 'Easy & Chill', subtitle: 'Calm, slow, laid back music' },
         { title: 'Balanced', subtitle: 'A mix of everything depending on the mood' },
@@ -144,11 +173,11 @@ const EnergyPreferenceStep = ({ onFinish, energy, setEnergy }) => {
     );
 };
 
-export const OnboardingFlow = ({ onComplete }) => {
+export const OnboardingFlow = ({ onComplete }: { onComplete: () => void }) => {
     const [step, setStep] = useState(1);
-    const [artists, setArtists] = useState([]);
-    const [genres, setGenres] = useState([]);
-    const [energy, setEnergy] = useState(null);
+    const [artists, setArtists] = useState<Artist[]>([]);
+    const [genres, setGenres] = useState<string[]>([]);
+    const [energy, setEnergy] = useState<EnergyPreference>(null);
 
     const handleFinish = async () => {
         const user = getCurrentUser();

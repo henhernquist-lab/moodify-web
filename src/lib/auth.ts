@@ -10,13 +10,26 @@ import {
     updateProfile,
     sendPasswordResetEmail
 } from "firebase/auth";
+import type { NextOrObserver, User } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
-const auth = getAuth(firebase_app);
-const db = getFirestore(firebase_app);
-const googleProvider = new GoogleAuthProvider();
+type OnboardingData = Record<string, unknown>;
 
-export async function signUpWithEmail(email, password, displayName) {
+function getFirebaseAuth() {
+    return getAuth(firebase_app);
+}
+
+function getFirebaseDb() {
+    return getFirestore(firebase_app);
+}
+
+function getGoogleProvider() {
+    return new GoogleAuthProvider();
+}
+
+export async function signUpWithEmail(email: string, password: string, displayName: string) {
+    const auth = getFirebaseAuth();
+    const db = getFirebaseDb();
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName });
     await setDoc(doc(db, "users", userCredential.user.uid), {
@@ -27,12 +40,14 @@ export async function signUpWithEmail(email, password, displayName) {
     return userCredential;
 }
 
-export function signInWithEmail(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
+export function signInWithEmail(email: string, password: string) {
+    return signInWithEmailAndPassword(getFirebaseAuth(), email, password);
 }
 
 export async function signInWithGoogle() {
-    const result = await signInWithPopup(auth, googleProvider);
+    const auth = getFirebaseAuth();
+    const db = getFirebaseDb();
+    const result = await signInWithPopup(auth, getGoogleProvider());
     const user = result.user;
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists()) {
@@ -47,22 +62,23 @@ export async function signInWithGoogle() {
 }
 
 export function signOut() {
-    return firebaseSignOut(auth);
+    return firebaseSignOut(getFirebaseAuth());
 }
 
 export function getCurrentUser() {
-    return auth.currentUser;
+    return getFirebaseAuth().currentUser;
 }
 
-export function onAuthStateChanged(callback) {
-    return firebaseOnAuthStateChanged(auth, callback);
+export function onAuthStateChanged(callback: NextOrObserver<User>) {
+    return firebaseOnAuthStateChanged(getFirebaseAuth(), callback);
 }
 
-export function resetPassword(email) {
-    return sendPasswordResetEmail(auth, email);
+export function resetPassword(email: string) {
+    return sendPasswordResetEmail(getFirebaseAuth(), email);
 }
 
-export async function checkOnboardingStatus(userId) {
+export async function checkOnboardingStatus(userId: string) {
+    const db = getFirebaseDb();
     const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
         return userDoc.data().onboardingComplete || false;
@@ -70,11 +86,12 @@ export async function checkOnboardingStatus(userId) {
     return false;
 }
 
-export async function completeOnboarding(userId, data) {
+export async function completeOnboarding(userId: string, data: OnboardingData = {}) {
+    const db = getFirebaseDb();
     await setDoc(doc(db, "users", userId), data, { merge: true });
     return await setDoc(doc(db, "users", userId), { onboardingComplete: true }, { merge: true });
 }
 
-export async function saveOnboardingData(userId, data) {
-    return setDoc(doc(db, "users", userId), data, { merge: true });
+export async function saveOnboardingData(userId: string, data: OnboardingData) {
+    return setDoc(doc(getFirebaseDb(), "users", userId), data, { merge: true });
 }
