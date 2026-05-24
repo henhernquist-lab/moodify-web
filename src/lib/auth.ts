@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
-const auth = getAuth(firebase_app);
+export const auth = getAuth(firebase_app);
 const db = getFirestore(firebase_app);
 const googleProvider = new GoogleAuthProvider();
 
@@ -78,3 +78,4 @@ export async function completeOnboarding(userId, data) {
 export async function saveOnboardingData(userId, data) {
     return setDoc(doc(db, "users", userId), data, { merge: true });
 }
+export { auth };
