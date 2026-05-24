@@ -7,6 +7,7 @@ import { useAuth } from '@/src/context/AuthContext'
 import { signOut } from '@/src/lib/auth'
 import * as Popover from '@radix-ui/react-popover';
 import { SpotifyImage } from '@/components/spotify-image';
+import type { MouseEvent } from 'react';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/', icon: Home, protected: false },
@@ -21,7 +22,7 @@ export function Sidebar() {
   const router = useRouter()
   const { user, signIn } = useAuth()
 
-  const handleNavClick = (e, href, isProtected) => {
+  const handleNavClick = (e: MouseEvent<HTMLAnchorElement>, href: string, isProtected: boolean) => {
     if (isProtected && !user) {
       e.preventDefault()
       signIn()

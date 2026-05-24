@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,17 +11,27 @@ const schema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-const SignInModal = ({ isOpen, onClose, onSignUp }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) });
+type SignInFormData = z.infer<typeof schema>;
+
+interface SignInModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSignUp: () => void;
+}
+
+const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Something went wrong';
+
+const SignInModal = ({ isOpen, onClose, onSignUp }: SignInModalProps) => {
+  const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({ resolver: zodResolver(schema) });
   const [firebaseError, setFirebaseError] = useState('');
   const [resetSent, setResetSent] = useState(false);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: SignInFormData) => {
     try {
       await signInWithEmail(data.email, data.password);
       onClose();
     } catch (error) {
-      setFirebaseError(error.message);
+      setFirebaseError(getErrorMessage(error));
     }
   };
 
@@ -28,7 +40,7 @@ const SignInModal = ({ isOpen, onClose, onSignUp }) => {
       await signInWithGoogle();
       onClose();
     } catch (error) {
-      setFirebaseError(error.message);
+      setFirebaseError(getErrorMessage(error));
     }
   }
 
@@ -39,7 +51,7 @@ const SignInModal = ({ isOpen, onClose, onSignUp }) => {
         await resetPassword(email);
         setResetSent(true);
       } catch (error) {
-        setFirebaseError(error.message);
+        setFirebaseError(getErrorMessage(error));
       }
     }
   }
@@ -61,7 +73,7 @@ const SignInModal = ({ isOpen, onClose, onSignUp }) => {
           </div>
           {firebaseError && <p className="text-[#FF6B6B] text-sm mb-4">{firebaseError}</p>}
           {resetSent && <p className="text-green-500 text-sm mb-4">Check your inbox for a password reset link.</p>}
-          <button type-="submit" className="w-full p-3 bg-[#7C5CFF] rounded text-white font-bold mb-4">Sign In</button>
+          <button type="submit" className="w-full p-3 bg-[#7C5CFF] rounded text-white font-bold mb-4">Sign In</button>
         </form>
         <button onClick={handleGoogleSignIn} className="w-full p-3 border border-white rounded text-white font-bold mb-4 flex items-center justify-center">
           <img src="/google.svg" alt="Google" className="w-6 h-6 mr-2" />

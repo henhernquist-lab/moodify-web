@@ -1,6 +1,8 @@
+'use client';
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User } from 'firebase/auth';
-import { auth, checkOnboardingStatus } from '../lib/auth';
+import type { User } from 'firebase/auth';
+import { checkOnboardingStatus, getCurrentUser, onAuthStateChanged } from '../lib/auth';
 import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
 import SignInModal from '../components/auth/SignInModal';
 import SignUpModal from '../components/auth/SignUpModal';
@@ -22,7 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [showSignUp, setShowSignUp] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = onAuthStateChanged(async (user: User | null) => {
       if (user) {
         const onboardingComplete = await checkOnboardingStatus(user.uid);
         if (onboardingComplete) {
@@ -42,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
-    setUser(auth.currentUser);
+    setUser(getCurrentUser());
   }
 
   return (

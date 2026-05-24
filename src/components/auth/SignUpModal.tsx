@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,16 +12,26 @@ const schema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
-const SignUpModal = ({ isOpen, onClose, onSignIn }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) });
+type SignUpFormData = z.infer<typeof schema>;
+
+interface SignUpModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSignIn: () => void;
+}
+
+const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Something went wrong';
+
+const SignUpModal = ({ isOpen, onClose, onSignIn }: SignUpModalProps) => {
+  const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormData>({ resolver: zodResolver(schema) });
   const [firebaseError, setFirebaseError] = useState('');
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: SignUpFormData) => {
     try {
       await signUpWithEmail(data.email, data.password, data.displayName);
       onClose();
     } catch (error) {
-      setFirebaseError(error.message);
+      setFirebaseError(getErrorMessage(error));
     }
   };
 
@@ -28,7 +40,7 @@ const SignUpModal = ({ isOpen, onClose, onSignIn }) => {
       await signInWithGoogle();
       onClose();
     } catch (error) {
-      setFirebaseError(error.message);
+      setFirebaseError(getErrorMessage(error));
     }
   }
 
