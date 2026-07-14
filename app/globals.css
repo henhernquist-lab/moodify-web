@@ -3,8 +3,48 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ─── Color tokens ─── */
+/* ─── Light-mode color tokens ─── */
 :root {
+  --bg-deep:      #F9FAFB;
+  --bg-mid:       #F3F4F6;
+  --bg-card:      #FFFFFF;
+  --border:       #E5E7EB;
+
+  --accent:       #7C5CFF;
+  --accent-blue:  #3B82F6;
+  --accent-cyan:  #06B6D4;
+
+  --foreground:   #111827;
+  --muted:        #6B7280;
+
+  --radius: 0.5rem;
+
+  /* shadcn compat */
+  --background:            var(--bg-deep);
+  --surface:               var(--bg-mid);
+  --card:                  var(--bg-card);
+  --card-foreground:       var(--foreground);
+  --popover:               var(--bg-card);
+  --popover-foreground:    var(--foreground);
+  --primary:               var(--accent);
+  --primary-foreground:    #ffffff;
+  --secondary:             var(--bg-mid);
+  --secondary-foreground:  var(--foreground);
+  --muted-bg:              var(--bg-mid);
+  --muted-foreground:      var(--muted);
+  --input:                 var(--bg-card);
+  --ring:                  var(--accent);
+  --destructive:           #ef4444;
+  --destructive-foreground: #ffffff;
+  --chart-1: var(--accent);
+  --chart-2: var(--accent-blue);
+  --chart-3: var(--accent-cyan);
+  --chart-4: #4e3abf;
+  --chart-5: #2a2255;
+}
+
+/* ─── Dark-mode color overrides ─── */
+.dark {
   --bg-deep:      #0B0B0F;
   --bg-mid:       #11131A;
   --bg-card:      #171A22;
@@ -17,9 +57,7 @@
   --foreground:   #F0F0F6;
   --muted:        #6B7280;
 
-  --radius: 0.5rem;
-
-  /* shadcn compat */
+  /* shadcn compat overrides */
   --background:            var(--bg-deep);
   --surface:               var(--bg-mid);
   --card:                  var(--bg-card);
@@ -228,43 +266,5 @@ input[type='range'].volume-slider::-moz-range-thumb {
   height: 10px;
   border: none;
   border-radius: 50%;
-  background: var(--accent);
-}
-
-/* ─── Intensity slider ─── */
-input[type='range'].intensity-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
-  height: 4px;
-  width: 100%;
-}
-input[type='range'].intensity-slider::-webkit-slider-runnable-track {
-  background: var(--border);
-  height: 4px;
-  border-radius: 2px;
-}
-input[type='range'].intensity-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  margin-top: -5px;
-  box-shadow: 0 0 8px rgba(124, 92, 255, 0.5);
-}
-input[type='range'].intensity-slider::-moz-range-track {
-  background: var(--border);
-  height: 4px;
-  border-radius: 2px;
-}
-input[type='range'].intensity-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border: none;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px rgba(124, 92, 255, 0.5);
+  background: var(--accent;
 }
