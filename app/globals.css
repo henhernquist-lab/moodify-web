@@ -268,3 +268,9 @@ input[type='range'].volume-slider::-moz-range-thumb {
   border-radius: 50%;
   background: var(--accent;
 }
+/* ─── Theme toggle transition ─── */
+html,
+body,
+* {
+  transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
