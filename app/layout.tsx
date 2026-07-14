@@ -5,6 +5,7 @@ import { AppShell } from '@/components/app-shell'
 import { NowPlayingProvider } from '@/src/lib/now-playing'
 import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/src/context/AuthContext'
+import { ThemeProvider } from 'next-themes'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,14 +32,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body>
-        <AuthProvider>
-          <NowPlayingProvider>
-            <AppShell>{children}</AppShell>
-            <Toaster />
-          </NowPlayingProvider>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <AuthProvider>
+            <NowPlayingProvider>
+              <AppShell>{children}</AppShell>
+              <Toaster />
+            </NowPlayingProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
